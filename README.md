@@ -1,128 +1,84 @@
 # HPM 听书 → APK · 方法 A（PWABuilder · 浏览器里点几下出 APK）
 
-不用 Android Studio、不用 Node、不用 JDK，全程在浏览器里完成。
+## ⚠️ 修复历史
+
+如果你已经按之前的 README 上传过文件，PWABuilder 报"Fix the links to your icons / Fix the icon types" 错误，**请用这一版重新上传**。
+
+之前的 `index.html` 把 manifest 用 data: URL 内嵌进 HTML，导致 PWABuilder 读到内嵌的 manifest 而不是外部文件，所有图标 URL 也都是 data:。这一版的 `index.html` 用外部 `./manifest.webmanifest` 链接，图标都是独立的 PNG 文件。
 
 ---
 
-## 步骤总览（约 10 分钟）
+## 文件清单（19 个文件）
 
-1. 把这个 `hpm-pwa/` 文件夹推到 GitHub
-2. 开启 GitHub Pages，拿到公开 HTTPS 网址
-3. 打开 PWABuilder，输入网址 → 下载 APK
-4. 装到手机
+把这 19 个文件全部传到 GitHub Pages 根目录：
 
----
-
-## ① 推到 GitHub
-
-如果不熟 git，最简单的方法：
-
-**方式 1 · 网页拖拽（推荐新手）**
-
-1. 去 https://github.com/new 新建仓库，名字随便（比如 `hpm-tingshu`），选 **Public**，**不要** 勾选 "Add a README"
-2. 创建后页面会出现 "uploading an existing file" 链接，点进去
-3. 把这个 `hpm-pwa/` 文件夹里**所有文件**（`index.html`, `manifest.webmanifest`, `sw.js`, 三张 png, `README.md`）拖到上传框
-4. 滚到底，点绿色按钮 **Commit changes**
-
-**方式 2 · 命令行（熟 git 的话）**
-
-```bash
-cd hpm-pwa
-git init -b main
-git add .
-git commit -m "HPM 听书 PWA v0.7"
-git remote add origin https://github.com/<你的用户名>/hpm-tingshu.git
-git push -u origin main
+```
+hpm-pwa/
+├── index.html                       ← 17.4 MB · 主程序
+├── manifest.webmanifest             ← PWA 元信息（独立文件 · 关键）
+├── sw.js                            ← Service Worker
+├── icon-72.png                      ← 启动器图标 · 各尺寸
+├── icon-96.png
+├── icon-128.png
+├── icon-144.png
+├── icon-152.png
+├── icon-192.png
+├── icon-384.png
+├── icon-512.png
+├── icon-maskable-192.png            ← 自适应图标（Android 8+）
+├── icon-maskable-512.png
+├── screenshot-1.png                 ← 商店截图 · 书架
+├── screenshot-2.png                 ← 商店截图 · 朗读界面
+└── README.md
 ```
 
 ---
 
-## ② 开启 GitHub Pages
+## 上传到 GitHub Pages
 
-1. 仓库页面 → **Settings**（顶部菜单）
-2. 左侧菜单 → **Pages**
-3. **Source** 选 **Deploy from a branch**
-4. **Branch** 选 **main** · folder 选 **/ (root)** · 点 **Save**
-5. 等 1-2 分钟，刷新页面，顶部会出现绿色横幅：
+### 如果是第一次
 
-   > Your site is live at **https://<用户名>.github.io/hpm-tingshu/**
+1. https://github.com/new → 新建 public 仓库（建议名字 `hpm-tingshu`），不勾选任何初始文件
+2. 进入仓库 → "uploading an existing file"
+3. **把 `hpm-pwa/` 里的全部 16 个文件（不是文件夹）拖进上传框**
+4. 滚到底 → Commit changes
+5. Settings → Pages → Source: `main` / `/ (root)` → Save
+6. 等 1-2 分钟，记下 URL：`https://<用户名>.github.io/hpm-tingshu/`
 
-   复制这个网址。
+### 如果你已经上传过
 
-**验证一下**：浏览器打开这个网址，HPM 应该正常显示并可以朗读。
+1. 仓库主页 → 点已存在的 `index.html`、`manifest.webmanifest` 等文件 → 点笔图标编辑 → 删除内容 → 上传新文件
+   或更直接：
+2. 仓库主页 → **Add file → Upload files** → 把新的 16 个文件**全部覆盖**进去
+3. 顺便把旧的 `icon-maskable-512.png`、`screenshot-*` 一起上传
 
----
+确保新版的 `index.html` 顶部出现这一行：
 
-## ③ 用 PWABuilder 出 APK
-
-1. 打开 https://www.pwabuilder.com/
-2. 输入你刚才的 GitHub Pages 网址 → 点 **Start**
-3. 它会给 PWA 评分（**HPM 听书已经按 PWA 规范配好了 manifest + service worker + icons，分数应该很高**）
-4. 如果有红色 issues，按提示点 "Fix" 即可；这个项目通常一切都是绿的
-5. 点页面右上角 **Package For Stores**
-6. 选 **Android** 那个卡片，点 **Generate Package**
-7. **Package options** 弹窗：
-   - **Package ID**: `com.hpm.tingshu`（已自动填好）
-   - **App name**: `HPM 听书`
-   - **Launcher name**: `HPM`
-   - **App version**: `1.0.0`
-   - **Signing key**: 选 **Use mine** 或 **Generate** 都行；**Generate** 最省事
-   - 其他保持默认
-8. 点 **Download**，会得到一个 zip：`hpm-tingshu.zip`
-9. 解压，里面的 **`app-release-signed.apk`** 就是可以装手机的 APK
-
-> 同包里的 **`app-release-bundle.aab`** 是给 Google Play 上架用的；个人用 APK 即可。
-
----
-
-## ④ 装到手机
-
-**Android 手机：**
-
-- 把 APK 通过微信/邮件/USB 传到手机
-- 点击 APK 文件 → 系统会提示"允许安装未知来源" → 同意 → 安装
-- 完成后桌面会出现 HPM 金色字标图标
-
-**或者用 adb（电脑接 USB 数据线）：**
-
-```bash
-adb install -r app-release-signed.apk
+```html
+<link rel="manifest" href="./manifest.webmanifest">
 ```
 
----
-
-## 重要说明 · PWABuilder 出的 APK 的本质
-
-PWABuilder 出的是 **TWA (Trusted Web Activity)** APK：
-
-- ✅ 桌面图标、独立窗口、看起来跟原生 App 一样
-- ✅ 离线可用（Service Worker 缓存）
-- ✅ 全部数据存本机 IndexedDB / localStorage，APK 重装也在
-- ⚠️ 后台朗读：屏幕亮时 OK，息屏后 Android 会冻结 WebView，朗读会停（这是所有 PWA-to-APK 工具的共通限制）
-
-如果要真正后台朗读，需要原生 TTS 桥接 —— 那就只能走 Android Studio + 上一个包的 `BACKGROUND.md` 方案。
+而**不是** `href="data:application/manifest+json;base64,..."`
 
 ---
 
-## 后续更新 App
+## PWABuilder 出 APK
 
-改完 `ui_kits/hpm-android/` 里的代码后，告诉我，我重新打包 `hpm-pwa/index.html`，你只要：
-
-1. 把新文件覆盖到 GitHub 仓库
-2. 等 1 分钟 GitHub Pages 自动更新
-3. 已安装的 PWA APK **下次启动时会自动拉到新版本**（不用重装 APK）
-
-这就是 PWA 比传统 APK 强的地方 —— 改了不用重新发版。
+1. https://www.pwabuilder.com/
+2. 输入 `https://<用户名>.github.io/hpm-tingshu/` → Start
+3. 应该看到几乎全绿评分（约 40+/45 分）
+4. 右上 **Package For Stores** → Android → **Generate Package**
+5. 弹窗选 **Signing key: Generate** → Download
+6. 解压 zip → `app-release-signed.apk` 拷到手机点击安装
 
 ---
 
-## 文件清单
+## 常见错误
 
-| 文件 | 作用 |
-|---|---|
-| `index.html` | 完整 App 单文件（17.4 MB，含全部代码、图标、音色配置） |
-| `manifest.webmanifest` | PWA 元信息（PWABuilder 读这个） |
-| `sw.js` | Service Worker（离线缓存，PWABuilder 必需） |
-| `icon-192.png` / `icon-512.png` | App 启动器图标 |
-| `icon-maskable-512.png` | Android 8+ 自适应图标 |
-| `README.md` | 你正在看的这个 |
+| 错误 | 原因 | 修复 |
+|---|---|---|
+| Fix the links to your icons | manifest 用了 data: URL | 用本版 README 的新 `index.html` |
+| Fix the icon types | 同上 | 同上 |
+| Add a service worker | sw.js 没传 / 路径错 | 确认 `sw.js` 在仓库根目录 |
+| Add screenshots | 没截图 | 本版已附 `screenshot-1.png`、`screenshot-2.png` |
+| Fix the icon sizes | 图标尺寸不够全 | 本版已生成 72/96/128/144/152/192/384/512 全套 |
