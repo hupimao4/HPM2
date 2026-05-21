@@ -1,0 +1,22 @@
+{
+  "name": "HPM 听书",
+  "short_name": "HPM",
+  "description": "本地 TXT 转有声书 · 离线可用 · 支持多种音色 · 5 种少女音",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#14110D",
+  "theme_color": "#14110D",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "categories": ["books", "productivity", "utilities"],
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "icon-192.png",          "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png",          "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
